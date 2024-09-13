@@ -12,26 +12,34 @@ import (
 	"os"
 )
 
-type invoiceImpl struct{}
+type shippingLabelImpl struct{}
 
-func NewServiceInvoice() domain.InvoiceInterface {
-	return &invoiceImpl{}
+func NewServiceShippingLabel() domain.ShippingLabelInterface {
+	return &shippingLabelImpl{}
 }
 
-func (s *invoiceImpl) GeneratingPDF(filterDate []string) ([]byte, error) {
-	jsonBytes, err := os.ReadFile("./dist/example/data.json")
+type rawData struct {
+	Setting       domain.Setting        `json:"setting"`
+	DataShipments []domain.DataShipment `json:"data"`
+}
+
+func (s *shippingLabelImpl) GeneratingPDF() ([]byte, error) {
+	jsonBytes, err := os.ReadFile("./dist/example/shipment.json")
 	if err != nil {
 		log.Println("Error while read dummy data:", err)
 		return nil, err
 	}
 
-	invoices := make([]domain.Invoice, 0)
-	err = json.Unmarshal(jsonBytes, &invoices)
+	var dummyData rawData
+	err = json.Unmarshal(jsonBytes, &dummyData)
 	if err != nil {
 		log.Println("Error while unmarshall:", err)
 		return nil, err
 	}
-	resTemp, err := template.ProcessTemplate("./dist/template/invoice.html", invoices)
+
+	pdfData := s.transformDataForGenerate(dummyData.DataShipments, dummyData.Setting)
+
+	resTemp, err := template.ProcessTemplate("./dist/template/template.html", pdfData)
 	if err != nil {
 		log.Println("Error while process template:", err)
 		return nil, err
@@ -45,7 +53,7 @@ func (s *invoiceImpl) GeneratingPDF(filterDate []string) ([]byte, error) {
 	return resPDFBytes, nil
 }
 
-func (s *invoiceImpl) transformDataForGenerate(shipments []domain.DataShipment, setting domain.Setting) []domain.PDFContent {
+func (s *shippingLabelImpl) transformDataForGenerate(shipments []domain.DataShipment, setting domain.Setting) []domain.PDFContent {
 	result := make([]domain.PDFContent, 0)
 
 	if len(shipments) > 0 {
@@ -60,12 +68,12 @@ func (s *invoiceImpl) transformDataForGenerate(shipments []domain.DataShipment, 
 				rightLogoURL = "J&T"
 			}
 
-			errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "../../dist/barcode/barcode-1.png", 600, 200)
+			errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "barcode-1.png", 600, 100)
 			if errGenFirstBarcode != nil {
 				log.Println("Error while generate first barcode:", errGenFirstBarcode)
 			}
 
-			errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "../../dist/barcode/barcode-2.png", 600, 200)
+			errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "barcode-2.png", 600, 100)
 			if errGenSecond != nil {
 				log.Println("Error while generate second barcode:", errGenSecond)
 			}
@@ -102,6 +110,7 @@ func (s *invoiceImpl) transformDataForGenerate(shipments []domain.DataShipment, 
 				Items:              eachShipment.Items,
 				Price:              eachShipment.Price,
 				IsUseUnboxingGuide: setting.IsUseUnboxingGuide,
+				CourierLogo:        eachShipment.CourierLogo,
 
 				PrintGenerateDate:       nowString,
 				FullyDestinationAddress: fullyDestinationAddress,

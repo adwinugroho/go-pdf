@@ -1,0 +1,14 @@
+version: "2.3"
+services:
+  jubelio_shipment:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shipment-service-shipping-label
+    ports:
+      - 8003:8003
+    # depends_on:
+    #   mysql:
+    #     condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json

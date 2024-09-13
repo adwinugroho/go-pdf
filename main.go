@@ -14,6 +14,6 @@ func main() {
 
 	app := fiber.New()
 
-	route.InvoiceRoute(app, time.Duration(30)*time.Second)
-	log.Fatal(app.Listen(":8000"))
+	route.Route(app, time.Duration(30)*time.Second)
+	log.Fatal(app.Listen(":8003"))
 }

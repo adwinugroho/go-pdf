@@ -9,15 +9,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type InvoiceHandler struct {
-	invoiceService domain.InvoiceInterface
+type ShippingLabelHandler struct {
+	shippingLabelService domain.ShippingLabelInterface
 }
 
-func NewInvoiceHandler(invService domain.InvoiceInterface) InvoiceHandler {
-	return InvoiceHandler{invoiceService: invService}
+func NewShippingLabelHandler(sbService domain.ShippingLabelInterface) ShippingLabelHandler {
+	return ShippingLabelHandler{shippingLabelService: sbService}
 }
 
-func (h *InvoiceHandler) GeneratePDF(c *fiber.Ctx) error {
+func (h *ShippingLabelHandler) GeneratePDF(c *fiber.Ctx) error {
 	var body domain.GeneratePDFReq
 	err := c.BodyParser(&body)
 	if err != nil {
@@ -33,7 +33,7 @@ func (h *InvoiceHandler) GeneratePDF(c *fiber.Ctx) error {
 		})
 	}
 
-	fileBytes, err := h.invoiceService.GeneratingPDF(body.Date)
+	fileBytes, err := h.shippingLabelService.GeneratingPDF()
 	if err != nil {
 		log.Println("[GeneratingPDF] error!", err)
 		return c.Status(500).JSON(map[string]interface{}{

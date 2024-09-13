@@ -2,20 +2,27 @@ package route
 
 import (
 	"go-pdf/route/handler"
-	service "go-pdf/service/invoice"
+	invService "go-pdf/service/invoice"
+	slService "go-pdf/service/shippinglabel"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func InvoiceRoute(app *fiber.App, timecontext time.Duration) {
+func Route(app *fiber.App, timecontext time.Duration) {
 
 	// Service
-	invService := service.NewServiceInvoice()
+	invoiceService := invService.NewServiceInvoice()
+	shippingLabelService := slService.NewServiceShippingLabel()
 	// handler
-	invHandler := handler.NewInvoiceHandler(invService)
+	invHandler := handler.NewInvoiceHandler(invoiceService)
+	slHandler := handler.NewShippingLabelHandler(shippingLabelService)
+
 	// Route
 	invRoute := app.Group("/invoice")
 	invRoute.Post("/generate", invHandler.GeneratePDF)
+
+	slRoute := app.Group("/shipping-label")
+	slRoute.Post("generate", slHandler.GeneratePDF)
 
 }

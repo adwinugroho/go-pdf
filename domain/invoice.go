@@ -1,14 +1,14 @@
 package domain
 
 type Invoice struct {
-	ID          string  `json:"id"`
-	OrderID     string  `json:"order_id"`
-	Name        string  `json:"name"`
-	Ship        Ship    `json:"ship"`
-	Items       []Items `json:"items"`
-	Status      string  `json:"status"`
-	TotalAmount float64 `json:"total_amount"`
-	Date        string  `json:"date"`
+	ID          string         `json:"id"`
+	OrderID     string         `json:"order_id"`
+	Name        string         `json:"name"`
+	Ship        Ship           `json:"ship"`
+	Items       []ItemsInvoice `json:"items"`
+	Status      string         `json:"status"`
+	TotalAmount float64        `json:"total_amount"`
+	Date        string         `json:"date"`
 }
 
 type Ship struct {
@@ -22,7 +22,7 @@ type Address struct {
 	Country string `json:"country"`
 }
 
-type Items struct {
+type ItemsInvoice struct {
 	Name     string  `json:"name"`
 	Price    float64 `json:"price"`
 	Quantity int     `json:"quantity"`
