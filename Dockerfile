@@ -26,13 +26,25 @@ RUN ls -l /app
 # Final stage
 FROM debian:bullseye-slim
 
+
+# Install CA certificates for HTTPS and wkhtmltopdf
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    wkhtmltopdf \
+    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
+
+# Add environment variables
+ENV environment="development"
+ENV fileservice_api_key="your-api-key"
+ENV fileservice_url="https://your-api"
 
 # Make dist directory
 RUN mkdir -p /dist
 
-# Install wkhtmltopdf and its dependencies
-RUN apt-get update && apt-get install -y wkhtmltopdf
+# # Install wkhtmltopdf and its dependencies
+# RUN apt-get update && apt-get install -y wkhtmltopdf
 
 # Verify installation of wkhtmltopdf
 RUN which wkhtmltopdf

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-pdf/domain"
-	"go-pdf/pkg/generator"
 	"go-pdf/pkg/helper"
 	"go-pdf/pkg/pdf"
 	"go-pdf/pkg/template"
@@ -60,15 +59,15 @@ func (s *invoiceImpl) transformDataForGenerate(shipments []domain.DataShipment, 
 				rightLogoURL = "J&T"
 			}
 
-			errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "../../dist/barcode/barcode-1.png", 600, 200)
-			if errGenFirstBarcode != nil {
-				log.Println("Error while generate first barcode:", errGenFirstBarcode)
-			}
+			// errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "../../dist/barcode/barcode-1.png", 600, 200)
+			// if errGenFirstBarcode != nil {
+			// 	log.Println("Error while generate first barcode:", errGenFirstBarcode)
+			// }
 
-			errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "../../dist/barcode/barcode-2.png", 600, 200)
-			if errGenSecond != nil {
-				log.Println("Error while generate second barcode:", errGenSecond)
-			}
+			// errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "../../dist/barcode/barcode-2.png", 600, 200)
+			// if errGenSecond != nil {
+			// 	log.Println("Error while generate second barcode:", errGenSecond)
+			// }
 
 			firstBarcodeImage := "../../dist/barcode/barcode-1.png"
 			secondBarcodeImage := "../../dist/barcode/barcode-2.png"

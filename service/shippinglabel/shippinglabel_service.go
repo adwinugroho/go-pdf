@@ -1,12 +1,15 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"go-pdf/domain"
+	"go-pdf/pkg/generator"
 	"go-pdf/pkg/helper"
 	"go-pdf/pkg/pdf"
 	"go-pdf/pkg/template"
+	"go-pdf/pkg/upload"
 	"log"
 	"os"
 )
@@ -65,19 +68,26 @@ func (s *shippingLabelImpl) transformDataForGenerate(shipments []domain.DataShip
 			rightLogoURL := eachShipment.CourierLogo
 			leftLogoURL := "https://shipment.jubelio.com/img/favicon.svg"
 
-			// errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "barcode-1.png", 600, 100)
-			// if errGenFirstBarcode != nil {
-			// 	log.Println("Error while generate first barcode:", errGenFirstBarcode)
-			// }
+			fBarcodeBytes, errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, 600, 100)
+			if errGenFirstBarcode != nil {
+				log.Println("Error while generate first barcode:", errGenFirstBarcode)
+			}
+			resFBarcode, err := upload.UploadImage(context.Background(), "barcode-1.png", fBarcodeBytes)
+			if err != nil {
+				log.Println("Error while generate first barcode:", errGenFirstBarcode)
+			}
 
-			// errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "barcode-2.png", 600, 100)
-			// if errGenSecond != nil {
-			// 	log.Println("Error while generate second barcode:", errGenSecond)
-			// }
+			sBarcodeBytes, errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, 600, 100)
+			if errGenSecond != nil {
+				log.Println("Error while generate second barcode:", errGenSecond)
+			}
+			resSBarcode, err := upload.UploadImage(context.Background(), "barcode-2.png", sBarcodeBytes)
+			if err != nil {
+				log.Println("Error while generate first barcode:", errGenFirstBarcode)
+			}
 
-			// only for test
-			firstBarcodeImage := "https://www.pngarts.com/files/8/Barcode-PNG-Image-Transparent-Background.png"
-			secondBarcodeImage := "https://www.pngarts.com/files/8/Barcode-PNG-Image-Transparent-Background.png"
+			firstBarcodeImage := resFBarcode.ObjectURL
+			secondBarcodeImage := resSBarcode.ObjectURL
 
 			fullyDestinationAddress := fmt.Sprintf("%s, %s, %s", eachShipment.DestinationAreaID, eachShipment.DestinationAddress, eachShipment.DestinationZipcode)
 			totalQty := len(eachShipment.Items)

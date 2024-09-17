@@ -1,38 +1,39 @@
 package generator
 
 import (
+	"bytes"
 	"image/png"
 	"log"
-	"os"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
 )
 
-func GenerateBarcode(enc, filename string, width, heigth int) error {
+func GenerateBarcode(enc string, width, height int) ([]byte, error) {
 	// Create the barcode
 	codabar, err := code128.Encode(enc)
 	if err != nil {
-		log.Println("Error while generate barcode:", err)
-		return err
+		log.Println("Error while generating barcode:", err)
+		return nil, err
 	}
 
-	resCode, err := barcode.Scale(codabar, width, heigth)
+	// Scale the barcode to the desired size
+	resCode, err := barcode.Scale(codabar, width, height)
 	if err != nil {
-		log.Println("Error while scale codabar barcode:", err)
-		return err
+		log.Println("Error while scaling barcode:", err)
+		return nil, err
 	}
 
-	// create the output file
-	file, _ := os.Create(filename)
-	defer file.Close()
+	// Create a buffer to write the PNG into memory
+	var buf bytes.Buffer
 
-	// encode the barcode as png
-	err = png.Encode(file, resCode)
+	// Encode the barcode as PNG and write it to the buffer
+	err = png.Encode(&buf, resCode)
 	if err != nil {
-		log.Println("Error encode png:", err)
-		return err
+		log.Println("Error while encoding PNG:", err)
+		return nil, err
 	}
 
-	return nil
+	// Return the bytes from the buffer
+	return buf.Bytes(), nil
 }
