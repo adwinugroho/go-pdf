@@ -68,6 +68,8 @@ func (s *shippingLabelImpl) transformDataForGenerate(shipments []domain.DataShip
 				rightLogoURL = "J&T"
 			}
 
+			leftLogoURL := "https://shipment.jubelio.com/img/favicon.svg"
+
 			errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "barcode-1.png", 600, 100)
 			if errGenFirstBarcode != nil {
 				log.Println("Error while generate first barcode:", errGenFirstBarcode)
@@ -78,8 +80,9 @@ func (s *shippingLabelImpl) transformDataForGenerate(shipments []domain.DataShip
 				log.Println("Error while generate second barcode:", errGenSecond)
 			}
 
-			firstBarcodeImage := "../../dist/barcode/barcode-1.png"
-			secondBarcodeImage := "../../dist/barcode/barcode-2.png"
+			// only for test
+			firstBarcodeImage := "https://image.similarpng.com/very-thumbnail/2021/06/Various-barcode,-qr-code-and-postcode-isolated-premium-vector-PNG.png"
+			secondBarcodeImage := "https://image.similarpng.com/very-thumbnail/2021/06/Various-barcode,-qr-code-and-postcode-isolated-premium-vector-PNG.png"
 
 			fullyDestinationAddress := fmt.Sprintf("%s, %s, %s", eachShipment.DestinationAreaID, eachShipment.DestinationAddress, eachShipment.DestinationZipcode)
 			totalQty := len(eachShipment.Items)
@@ -122,6 +125,7 @@ func (s *shippingLabelImpl) transformDataForGenerate(shipments []domain.DataShip
 
 				CenterLogoURL:      centerLogoURL,
 				RightLogoURL:       rightLogoURL,
+				LeftLogoURL:        leftLogoURL,
 				FirstBarcodeImage:  firstBarcodeImage,
 				SecondBarcodeImage: secondBarcodeImage,
 			}

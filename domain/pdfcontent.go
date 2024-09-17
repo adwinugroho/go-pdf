@@ -3,6 +3,7 @@ package domain
 type PDFContent struct {
 	CenterLogoURL      string `json:"center_logo_url"`
 	RightLogoURL       string `json:"right_logo_url"`
+	LeftLogoURL        string `json:"left_logo_url"`
 	IsUseUnboxingGuide bool   `json:"is_use_unboxing_guide"`
 	FirstBarcodeImage  string `json:"first_barcode_image"`
 	SecondBarcodeImage string `json:"second_barcode_image"`

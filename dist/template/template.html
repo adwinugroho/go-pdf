@@ -7,7 +7,22 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0; /* Removed margin to avoid unintended offsets */
+        }
+        .container {
+            padding: 5px; /* Reduced padding */
+            margin: auto;
+            border: 1px solid #000;
+            position: relative;
+            font-size: 12px;
+            box-sizing: border-box; /* Ensures padding does not affect overall dimensions */
+            page-break-after: always; /* Ensures each page is on a separate page */
+        }
+        img {
+            max-width: 100%;
+            max-height: 50px;
+            width: auto;
+            height: auto;
         }
         .header {
             display: flex;
@@ -23,7 +38,8 @@
             text-align: center;
         }
         .header img {
-            height: 50px;
+            max-width: 100%; /* Ensures images scale properly */
+            height: auto;
         }
         .barcode-section {
             display: flex;
@@ -32,7 +48,8 @@
             margin: 20px 0;
         }
         .barcode-section img {
-            height: 80px;
+            max-width: 100%; /* Ensures images do not exceed container width */
+            height: auto;
             margin: 5px 0;
         }
         .boxed-text {
@@ -56,6 +73,7 @@
         .info-table {
             width: 100%;
             border-collapse: collapse;
+            max-width: 100%; /* Ensures table does not overflow */
         }
         .info-table, .info-table th, .info-table td {
             border: 1px solid black;
@@ -77,90 +95,102 @@
     </style>
 </head>
 <body>
-    {{range . }}
-    <!-- Header with logos and additional text -->
-    <div class="header">
-        <!-- Left logo and text -->
-        <div class="left">
-            <p>{{ .RefNo }}</p>
-            <img src="" alt="Logo Left">
-            <p>{{ .SortCode }}</p>
-        </div>
-        
-        <!-- Center logo -->
-        <div class="center">
-            <img src="" alt="Logo Center">
-        </div>
-        
-        <!-- Right logo and text -->
-        <div class="right">
-            <p>Waktu Order: {{ .AwbGeneratedDate }}</p>
-            <p>Waktu Print: {{ .PrintGenerateDate }}</p> <!--- variable baru -->
-            <img src="{{ .CourierLogo }}" alt="Logo Right">
-            <p>{{ .CourierName }}</p>
-            <div class="square-box">
-                <p>{{ .ShippingType }}</p> <!-- variable baru -->
+    <div class="container">
+        {{range . }}
+        <!-- Header with logos and additional text -->
+        <div class="header">
+            <!-- Left logo and text -->
+            <div class="left">
+                <p>{{ .RefNo }}</p>
+                {{ if ne .LeftLogoURL "" }}
+                <img src="{{ .LeftLogoURL }}" alt="Logo Left">
+                {{ end }}
+                <p>{{ .SortCode }}</p>
+            </div>
+
+            <!-- Center logo -->
+            {{ if ne .CenterLogoURL "" }}
+            <div class="center">
+                <img src="{{ .CenterLogoURL }}" alt="Logo Center">
+            </div>
+            {{ end }}
+
+            <!-- Right logo and text -->
+            <div class="right">
+                <p>Waktu Order: {{ .AwbGeneratedDate }}</p>
+                <p>Waktu Print: {{ .PrintGenerateDate }}</p> <!--- variable baru -->
+                <img src="{{ .CourierLogo }}" alt="Logo Right">
+                <p>{{ .CourierName }}</p>
+                <div class="square-box">
+                    <p>{{ .ShippingType }}</p> <!-- variable baru -->
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Barcode section -->
-    <div class="barcode-section">
-        <img src="" alt="Barcode Image 1">
-        <p>{{ .Awb }}</p> <!-- Text below first barcode -->
-        <div class="boxed-text">
-            <p>Wajib Kirim Video Unboxing Paket jika ada barang yang tidak sesuai</p>
-        </div> <!-- Boxed text below first barcode text -->
-        <img src="" alt="Barcode Image 2">
-        <p>No. Pesanan: {{ .RefNo }}</p> <!-- Text below second barcode -->
-    </div>
-
-    <!-- Information section (split into two parts) -->
-    <div class="info">
-        <!-- Left Information (Recipient) -->
-        <div class="left-info">
-            <p><strong>Kepada:</strong> {{ .DestinationName }}</p>
-            <p><strong>No. Telp:</strong> {{ .DestinationPhone }}</p>
-            <p><strong>Alamat:</strong> {{ .FullyDestinationAddress }}</p> <!-- variable baru -->
-        </div>
-        
-        <!-- Right Information (Sender, costs, etc.) -->
-        <div class="right-info">
-            <p><strong>Dari:</strong> {{  .OriginName }}</p>
-            <p><strong>No. Pengirim:</strong> {{ .OriginPhone }}</p>
-            <p><strong>Asuransi:</strong> {{  .ShippingInsurance }}</p>
-            <p><strong>Biaya Kirim:</strong> {{  .Price }}</p>
-            <p><strong>Total Biaya:</strong> {{  .TotalPrice }}</p> <!-- variable baru -->
-            <p><strong>Berat:</strong> {{  .TotalWeight }} </p> <!-- variable baru -->
-        </div>
-    </div>
-
-    <!-- Product table -->
-    <table class="info-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Produk</th>
-                <th>SKU</th>
-                <th>Qty</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{range $eachItem := .Items}}
-            <tr>
-                <td>{{ 1 }}</td>
-                <td>{{ $eachItem.ItemName }}</td>
-                <td>{{ $eachItem.ItemCode }}</td>
-                <td>{{ $eachItem.Quantity }}</td>
-            </tr>
+        <!-- Barcode section -->
+        <div class="barcode-section">
+            {{ if ne .FirstBarcodeImage "" }}
+            <img src="{{ .FirstBarcodeImage }}" alt="Barcode Image 1">
             {{ end }}
-        </tbody>
-    </table>
+            <p>{{ .Awb }}</p> <!-- Text below first barcode -->
+            {{ if .IsUseUnboxingGuide }}
+            <div class="boxed-text">
+                <p>Wajib Kirim Video Unboxing Paket jika ada barang yang tidak sesuai</p>
+            </div> <!-- Boxed text below first barcode text -->
+            {{ end }}
+            {{ if ne .SecondBarcodeImage "" }}
+            <img src="{{ .SecondBarcodeImage }}" alt="Barcode Image 2">
+            {{ end }}
+            <p>No. Pesanan: {{ .RefNo }}</p> <!-- Text below second barcode -->
+        </div>
 
-    <!-- Total qty section -->
-    <div class="total-qty">
-        <p><strong>Total Qty:</strong> {{ .TotalQty }}</p> <!-- variable baru -->
+        <!-- Information section (split into two parts) -->
+        <div class="info">
+            <!-- Left Information (Recipient) -->
+            <div class="left-info">
+                <p><strong>Kepada:</strong> {{ .DestinationName }}</p>
+                <p><strong>No. Telp:</strong> {{ .DestinationPhone }}</p>
+                <p><strong>Alamat:</strong> {{ .FullyDestinationAddress }}</p> <!-- variable baru -->
+            </div>
+
+            <!-- Right Information (Sender, costs, etc.) -->
+            <div class="right-info">
+                <p><strong>Dari:</strong> {{  .OriginName }}</p>
+                <p><strong>No. Pengirim:</strong> {{ .OriginPhone }}</p>
+                <p><strong>Asuransi:</strong> {{  .ShippingInsurance }}</p>
+                <p><strong>Biaya Kirim:</strong> {{  .Price }}</p>
+                <p><strong>Total Biaya:</strong> {{  .TotalPrice }}</p> <!-- variable baru -->
+                <p><strong>Berat:</strong> {{  .TotalWeight }} </p> <!-- variable baru -->
+            </div>
+        </div>
+
+        <!-- Product table -->
+        <table class="info-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Produk</th>
+                    <th>SKU</th>
+                    <th>Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range $eachItem := .Items}}
+                <tr>
+                    <td>{{ 1 }}</td>
+                    <td>{{ $eachItem.ItemName }}</td>
+                    <td>{{ $eachItem.ItemCode }}</td>
+                    <td>{{ $eachItem.Quantity }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+
+        <!-- Total qty section -->
+        <div class="total-qty">
+            <p><strong>Total Qty:</strong> {{ .TotalQty }}</p> <!-- variable baru -->
+        </div>
+        {{ end }}
     </div>
-{{ end }}
 </body>
 </html>
