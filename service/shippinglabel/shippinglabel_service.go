@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-pdf/domain"
-	"go-pdf/pkg/generator"
 	"go-pdf/pkg/helper"
 	"go-pdf/pkg/pdf"
 	"go-pdf/pkg/template"
@@ -23,7 +22,7 @@ type rawData struct {
 	DataShipments []domain.DataShipment `json:"data"`
 }
 
-func (s *shippingLabelImpl) GeneratingPDF() ([]byte, error) {
+func (s *shippingLabelImpl) GeneratingPDF(size string) ([]byte, error) {
 	jsonBytes, err := os.ReadFile("./dist/example/shipment.json")
 	if err != nil {
 		log.Println("Error while read dummy data:", err)
@@ -39,13 +38,13 @@ func (s *shippingLabelImpl) GeneratingPDF() ([]byte, error) {
 
 	pdfData := s.transformDataForGenerate(dummyData.DataShipments, dummyData.Setting)
 
-	resTemp, err := template.ProcessTemplate("./dist/template/template.html", pdfData)
+	resTemp, err := template.ProcessTemplate(fmt.Sprintf("./dist/template/template-%s.html", size), size, pdfData)
 	if err != nil {
 		log.Println("Error while process template:", err)
 		return nil, err
 	}
 
-	resPDFBytes, err := pdf.GenerateWithWKHtmlToPDF(resTemp, "A6", false)
+	resPDFBytes, err := pdf.GenerateWithWKHtmlToPDF(resTemp, size, false)
 	if err != nil {
 		log.Println("Error while generate pdf with WKhtml:", err)
 		return nil, err
@@ -63,26 +62,22 @@ func (s *shippingLabelImpl) transformDataForGenerate(shipments []domain.DataShip
 				centerLogoURL = setting.LogoURL
 			}
 
-			rightLogoURL := ""
-			if eachShipment.CourierID == 1 {
-				rightLogoURL = "J&T"
-			}
-
+			rightLogoURL := eachShipment.CourierLogo
 			leftLogoURL := "https://shipment.jubelio.com/img/favicon.svg"
 
-			errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "barcode-1.png", 600, 100)
-			if errGenFirstBarcode != nil {
-				log.Println("Error while generate first barcode:", errGenFirstBarcode)
-			}
+			// errGenFirstBarcode := generator.GenerateBarcode(eachShipment.Awb, "barcode-1.png", 600, 100)
+			// if errGenFirstBarcode != nil {
+			// 	log.Println("Error while generate first barcode:", errGenFirstBarcode)
+			// }
 
-			errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "barcode-2.png", 600, 100)
-			if errGenSecond != nil {
-				log.Println("Error while generate second barcode:", errGenSecond)
-			}
+			// errGenSecond := generator.GenerateBarcode(eachShipment.RefNo, "barcode-2.png", 600, 100)
+			// if errGenSecond != nil {
+			// 	log.Println("Error while generate second barcode:", errGenSecond)
+			// }
 
 			// only for test
-			firstBarcodeImage := "https://image.similarpng.com/very-thumbnail/2021/06/Various-barcode,-qr-code-and-postcode-isolated-premium-vector-PNG.png"
-			secondBarcodeImage := "https://image.similarpng.com/very-thumbnail/2021/06/Various-barcode,-qr-code-and-postcode-isolated-premium-vector-PNG.png"
+			firstBarcodeImage := "https://www.pngarts.com/files/8/Barcode-PNG-Image-Transparent-Background.png"
+			secondBarcodeImage := "https://www.pngarts.com/files/8/Barcode-PNG-Image-Transparent-Background.png"
 
 			fullyDestinationAddress := fmt.Sprintf("%s, %s, %s", eachShipment.DestinationAreaID, eachShipment.DestinationAddress, eachShipment.DestinationZipcode)
 			totalQty := len(eachShipment.Items)

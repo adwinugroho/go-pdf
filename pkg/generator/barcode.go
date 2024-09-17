@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"image/png"
 	"log"
 	"os"
@@ -24,16 +23,8 @@ func GenerateBarcode(enc, filename string, width, heigth int) error {
 		return err
 	}
 
-	// Ensure the directory exists
-	dir := "/dist/barcode"
-	err = os.MkdirAll(dir, 0755)
-	if err != nil {
-		log.Println("Error while mkdir barcode:", err)
-		return err
-	}
-
 	// create the output file
-	file, _ := os.Create(fmt.Sprintf("%s/%s", dir, filename))
+	file, _ := os.Create(filename)
 	defer file.Close()
 
 	// encode the barcode as png

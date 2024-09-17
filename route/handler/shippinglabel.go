@@ -33,7 +33,7 @@ func (h *ShippingLabelHandler) GeneratePDF(c *fiber.Ctx) error {
 		})
 	}
 
-	fileBytes, err := h.shippingLabelService.GeneratingPDF()
+	fileBytes, err := h.shippingLabelService.GeneratingPDF(body.Size)
 	if err != nil {
 		log.Println("[GeneratingPDF] error!", err)
 		return c.Status(500).JSON(map[string]interface{}{
@@ -43,7 +43,7 @@ func (h *ShippingLabelHandler) GeneratePDF(c *fiber.Ctx) error {
 
 	// Ensure the directory exists
 	dir := "/dist/download"
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0777); err != nil {
 		log.Println("[MkdirAll] error!", err)
 		return c.Status(500).JSON(map[string]interface{}{
 			"message": "Internal Server Error",

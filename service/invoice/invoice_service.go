@@ -31,7 +31,7 @@ func (s *invoiceImpl) GeneratingPDF(filterDate []string) ([]byte, error) {
 		log.Println("Error while unmarshall:", err)
 		return nil, err
 	}
-	resTemp, err := template.ProcessTemplate("./dist/template/invoice.html", invoices)
+	resTemp, err := template.ProcessTemplate("./dist/template/invoice.html", "invoice", invoices)
 	if err != nil {
 		log.Println("Error while process template:", err)
 		return nil, err

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shipping Label - Jubelio Shipment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            /* Removed margin to avoid unintended offsets */
+        }
+        .container {
+            margin: 1rem;
+            padding: 1rem;
+            /* Reduced padding */
+            /* border: 2px solid #000; */
+            position: relative;
+            font-size: 10px;
+            box-sizing: border-box;
+            /* Ensures padding does not affect overall dimensions */
+            page-break-after: always;
+            /* Ensures each page is on a separate page */
+        }
+    </style>
+</head>
+
+<body>
+    {{ range . }}
+    <main class="container">
+        <!-- Header SO Number and Order Data -->
+        <div style="display: flex; justify-content: space-between">
+            <h1 style="font-size: 8px">{{ .RefNo }}</h1>
+            <div>
+                <h1 style="font-size: 8px">Waktu order: {{ .AwbGeneratedDate }}</h1>
+                <h1 style="font-size: 8px">Waktu print: {{ .PrintGenerateDate }}</h1>
+            </div>
+        </div>
+
+        <!-- Header Logo and Courier -->
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          margin-top: 1.25rem;
+        ">
+            <div style="display: flex; flex-direction: column; align-items: center">
+                <img src="{{ .LeftLogoURL }}" alt="Logo Left" style="height: 50px; width: 50px" />
+                <h1 style="font-weight: 600; font-size: 8px; margin-top: 1rem">
+                    {{ .SortCode }}
+                </h1>
+            </div>
+            <!-- Logo Seller -->
+            {{ if ne .CenterLogoURL "" }}
+            <div>
+                <img src="{{ .CenterLogoURL }}" alt="Logo Right" style="height: 50px; width: 50px" />
+            </div>
+            {{ end }}
+            <!-- Logo Courier -->
+            <div style="display: flex; flex-direction: column; text-align: center">
+                <img src="{{ .RightLogoURL }}" alt="Logo Right" style="height: 50px; width: 50px" />
+                <h1 style="margin-top: 0.5rem; font-size:10px;">{{ .CourierName }}</h1>
+                <div style="
+              border: 2px solid black;
+              padding: 0.25rem;
+              text-align: center;
+              margin-top: 0.5rem;
+              font-size: 10px;
+            ">
+                    {{ .ShippingType }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Barcode Section 1 -->
+        <div style="width: 100%; margin-top: 1.25rem; text-align: center">
+            <img src="{{ .FirstBarcodeImage }}" alt="Barcode Image 1"
+                style="height: 50px; width: 100%; object-fit: cover" />
+            <h1 style="margin-top: 0.5rem; font-size: 8px">
+                {{ .Awb }}
+            </h1>
+        </div>
+
+        <!-- Notes Section Eg: Unboxing Guide -->
+        {{ if .IsUseUnboxingGuide }}
+        <div style="
+          width: 100%;
+          border: 2px solid black;
+          margin-top: 0.5rem;
+          text-align: center;
+        ">
+            <h1 style="font-size: 8px">
+                Wajib Kirim Video Unboxing Paket Jika Ada Barang Yang Tidak Sesuai
+            </h1>
+        </div>
+        {{ end }}
+
+        <!-- Barcode Section 2 -->
+        <div style="width: 100%; margin-top: 1.25rem; text-align: center">
+            <img src="{{ .SecondBarcodeImage }}" alt="Barcode Image 2"
+                style="height: 50px; width: 100%; object-fit: cover" />
+            <h1 style="margin-top: 0.5rem; font-size: 8px">{{ .RefNo }}</h1>
+        </div>
+
+        <!-- Detail Customer Data -->
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          margin-top: 1.25rem;
+        ">
+            <div style="width: 100%; margin-right: 2.5rem">
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Kepada</span>
+                    <span>: {{ .DestinationName }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>No. Telp</span>
+                    <span>: {{ .DestinationPhone }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Alamat</span>
+                    <span>: {{ .FullyDestinationAddress }}</span>
+                </div>
+            </div>
+            <div style="width: 100%">
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Dari</span>
+                    <span>: {{ .OriginName }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>No. Pengirim</span>
+                    <span>: {{ .OriginPhone }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Asuransi</span>
+                    <span>: {{ .ShippingInsurance }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Biaya Kirim</span>
+                    <span>: {{ .Price }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Total Biaya</span>
+                    <span>: {{ .TotalPrice }}</span>
+                </div>
+                <div style="
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            ">
+                    <span>Berat</span>
+                    <span>: {{ .TotalWeight }} gram</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 0.5rem">
+            <!-- Product Table -->
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid black">No</th>
+                        <th style="border: 1px solid black">Nama Produk</th>
+                        <th style="border: 1px solid black">SKU</th>
+                        <th style="border: 1px solid black">Qty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $index, $eachItem := .Items}}
+                    <tr>
+                        <td style="border: 1px solid black; padding: 0 0.5rem">{{ add $index 1}}</td>
+                        <td style="border: 1px solid black; padding: 0 0.5rem">{{ $eachItem.ItemName }}</td>
+                        <td style="border: 1px solid black; padding: 0 0.5rem">{{ $eachItem.ItemCode }}</td>
+                        <td style="border: 1px solid black; padding: 0 0.5rem">{{ $eachItem.Quantity }}</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+
+            <!-- Total qty section -->
+            <div style="
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            margin-bottom: 5px;
+          ">
+                <p><strong>Total Qty:</strong> {{ .TotalQty }}</p>
+            </div>
+        </div>
+    </main>
+    {{ end }}
+</body>
+
+</html>

@@ -2,12 +2,18 @@ package template
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 )
 
-func ProcessTemplate(templateFilename string, data interface{}) (string, error) {
-	t, err := template.ParseFiles(templateFilename)
+func ProcessTemplate(templateFilename, templateVersion string, data interface{}) (string, error) {
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}
+	t, err := template.New(fmt.Sprintf("template-%s.html", templateVersion)).Funcs(funcMap).ParseFiles(templateFilename)
 	if err != nil {
 		log.Printf("Error while parse template file:%+v\n", err)
 		return "", err
